@@ -4,7 +4,7 @@ import { EvalueChatService } from './evalue-chat.service';
 
 @Module({
   imports: [HttpModule.register({
-    baseURL: 'https://evolution.somaxsis.dev.br'
+    baseURL: process.env.EVALUE_CHAT_URL
   })],
   controllers: [],
   providers: [EvalueChatService],

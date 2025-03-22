@@ -14,11 +14,6 @@ export class sendMessageQueryParams {
   numero: string;
 
   @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  agendamento: string;
-
-  @ApiPropertyOptional()
   @IsString( {always: true})
   token: string;
 

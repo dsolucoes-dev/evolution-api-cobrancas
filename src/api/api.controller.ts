@@ -18,7 +18,7 @@ export class ApiController {
     @Res() res: Response,
   ) {
     try {
-       await this.apiService.findAll(query);
+       await this.apiService.sendManual(query);
        res.status(200).json({ message: 'Mensagem enviada com sucesso' });
     } catch (error) {
       return res.status(400).json({ error: error.message });

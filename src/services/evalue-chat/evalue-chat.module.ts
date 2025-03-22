@@ -1,9 +1,13 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { EvalueChatController } from './evalue-chat.controller';
 import { EvalueChatService } from './evalue-chat.service';
 
 @Module({
-  controllers: [EvalueChatController],
-  providers: [EvalueChatService]
+  imports: [HttpModule.register({
+    baseURL: 'https://evolution.somaxsis.dev.br'
+  })],
+  controllers: [],
+  providers: [EvalueChatService],
+  exports: [EvalueChatService]
 })
 export class EvalueChatModule {}

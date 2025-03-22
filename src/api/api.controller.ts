@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { Response } from 'express';
 import { ApiService } from './api.service';
 import { sendMessageQueryParams } from './dto/get-send';
 
@@ -9,11 +10,18 @@ export class ApiController {
 
   @Get()
   @ApiOperation({ summary: 'Listar produtos com filtros' })
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Lista de produtos retornada com sucesso',
   })
-  sendManual(@Query() query: sendMessageQueryParams) {
-    return this.apiService.findAll();
+  async sendManual(
+    @Query() query: sendMessageQueryParams,
+    @Res() res: Response,
+  ) {
+    try {
+       await this.apiService.findAll(query);
+       res.status(200).json({ message: 'Mensagem enviada com sucesso' });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
   }
-
 }

@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { sendMessageQueryParams } from './dto/get-send';
 
 @Injectable()
 export class ApiService {
-  findAll() {
-    return 'This action returns all api';
+  async findAll(data: sendMessageQueryParams) {
+    const { agendamento, gerar_pdf, mensagem, numero, token } = data;
+
+    
   }
 }

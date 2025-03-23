@@ -22,7 +22,7 @@ export class ApiController {
     try {
 
       const id = await this.sendMessageTriggerProducerService.sendMessageTriggerJob(query);
-        res.status(200).send(`queued job with id: ${id}`);
+        res.status(200).send(`Mensagem enviada com sucesso, id: ${id}`);
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }

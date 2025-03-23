@@ -10,7 +10,7 @@ export class sendMessageTriggerProducerService {
   ) {}
 
   async sendMessageTriggerJob(data: any) {
-    await this.sendMessageTriggerQueue.add('send-message-trigger-job', data, {
+   const  d = await this.sendMessageTriggerQueue.add('send-message-trigger-job', data, {
       attempts: 3,
       backoff: 5000,
     });
@@ -21,6 +21,6 @@ export class sendMessageTriggerProducerService {
     // console.log('Jobs in the queue:', jobs);
     // console.log('Job added to queue');
     
-    return 'Done';
+    return `${data.numero}@${d.id}`;
   }
 }

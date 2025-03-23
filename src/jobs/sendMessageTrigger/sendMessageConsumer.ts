@@ -60,6 +60,9 @@ export class sendMessageTriggerConsumer {
         }
       }
     }
+
+    console.log(base64Urls.length, gerar_pdf);
+    
     
     if (base64Urls.length > 0 && gerar_pdf === 'sim') {
       console.log('Enviando mensagem com media');
@@ -111,24 +114,27 @@ export class sendMessageTriggerConsumer {
   private async downloadAndConvertToBase64(url: string, convertToPdf: boolean = false): Promise<string> {
     // Garantir que a URL tenha o protocolo
     const validUrl = url.startsWith('http') ? url : `https://${url}`;
+    
+    this.logger.log(`Starting to process URL: ${validUrl}`);
+    this.logger.log(`Convert to PDF: ${convertToPdf}`);
 
     try {
       if (convertToPdf) {
-        // Iniciar o navegador Puppeteer para converter HTML para PDF
+        this.logger.log('Launching Puppeteer browser...');
         const browser = await puppeteer.launch({
           headless: true,
           args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
         
         const page = await browser.newPage();
+        this.logger.log('Navigating to page...');
         
-        // Navegar até a URL
         await page.goto(validUrl, {
-          waitUntil: 'networkidle2', // Espera até que a página esteja carregada
-          timeout: 30000, // Tempo limite de 30 segundos
+          waitUntil: 'networkidle2',
+          timeout: 30000,
         });
         
-        // Gerar o PDF
+        this.logger.log('Generating PDF...');
         const pdfBuffer = await page.pdf({
           format: 'A4',
           printBackground: true,
@@ -140,24 +146,23 @@ export class sendMessageTriggerConsumer {
           },
         });
         
-        // Fechar o navegador
         await browser.close();
+        this.logger.log('PDF generated successfully');
         
-        // Converter o buffer do PDF para base64
         return Buffer.from(pdfBuffer).toString('base64');
       } else {
-        // Fazer requisição HTTP para obter os dados da URL (comportamento original)
+        this.logger.log('Making HTTP request...');
         const response = await firstValueFrom(
           this.httpService.get(validUrl, {
             responseType: 'arraybuffer',
           }),
         );
         
-        // Converter o buffer para base64
+        this.logger.log('Content downloaded successfully');
         return Buffer.from(response.data).toString('base64');
       }
     } catch (error) {
-      console.error(`Erro ao processar a URL ${validUrl}:`, error.message);
+      this.logger.error(`Error processing URL ${validUrl}: ${error.message}`);
       throw error;
     }
   }

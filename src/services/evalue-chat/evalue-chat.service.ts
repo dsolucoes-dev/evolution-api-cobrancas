@@ -40,20 +40,17 @@ export class EvalueChatService {
     
     try {
       const isValidNumberWithCountryCode = /^\[1-9]\d{1,14}$/;
-
-      console.log(isValidNumberWithCountryCode.test(data.numero)
-      ? data.numero
-      : `55${data.numero}
-      `);
       
+      const numberWithCountryCode = data.numero.startsWith('55') 
+      ? data.numero 
+      : `55${data.numero}`;
+
 
       await firstValueFrom(
         this.httpService.post(
           `/message/sendMedia/${data.instancia}`,
           {
-            number: isValidNumberWithCountryCode.test(data.numero)
-              ? data.numero
-              : `55${data.numero}`,
+            number: numberWithCountryCode,
             mediatype: 'document',
             mimetype: 'application/pdf',
             caption: data.mensagem,
@@ -68,6 +65,8 @@ export class EvalueChatService {
         ),
       );
     } catch (error) {
+      console.log('error', error.response.data.response || error);
+      
       throw new Error(JSON.stringify(error.response.data) || error);
     }
   }

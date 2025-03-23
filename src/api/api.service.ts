@@ -13,9 +13,9 @@ export class ApiService {
   ) {}
 
   async sendManual(data: sendMessageQueryParams) {
-    const { gerar_pdf, set_to,set_msg, token, key } = data;
+    const { gerar_pdf, mensagem,numero, token, key } = data;
     // Extrair URLs da mensagem
-    const urls = this.extractUrlsFromMessage(set_msg);
+    const urls = this.extractUrlsFromMessage(mensagem);
     // Array para armazenar as URLs em formato base64
     const base64Urls = [];
 
@@ -53,22 +53,22 @@ export class ApiService {
       console.log('Enviando mensagem com media');
       await this.evalueChatService.sendMessageMedia({
         instancia: data.key,
-        mensagem: set_msg,
-        numero: set_to,
+        mensagem: mensagem,
+        numero: numero,
         token: token,
         media: base64Urls.map((url) => url.base64Data),
       });
     } else {
       await this.evalueChatService.sendMessage({
         instancia: data.key,
-        mensagem: set_msg,
-        numero: set_to,
+        mensagem: mensagem,
+        numero: numero,
         token: token,
       });
     }
 
     return {
-      set_msg,
+      mensagem,
       urls,
       base64Urls,
     };

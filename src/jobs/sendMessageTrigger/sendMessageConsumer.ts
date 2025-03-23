@@ -23,8 +23,8 @@ export class sendMessageTriggerConsumer {
   }
 
   async sendManual(data: sendMessageQueryParams) {
-    const { gerar_pdf, set_to, set_msg, token, key } = data;
-    const urls = this.extractUrlsFromMessage(set_msg);
+    const { gerar_pdf, mensagem, numero, token, key } = data;
+    const urls = this.extractUrlsFromMessage(mensagem);
     const base64Urls = [];
 
     if (gerar_pdf === 'sim') {
@@ -61,22 +61,22 @@ export class sendMessageTriggerConsumer {
       console.log('Enviando mensagem com media');
       await this.evalueChatService.sendMessageMedia({
         instancia: data.key,
-        mensagem: set_msg,
-        numero: set_to,
+        mensagem: mensagem,
+        numero: numero,
         token: token,
         media: base64Urls.map((url) => url.base64Data),
       });
     } else {
       await this.evalueChatService.sendMessage({
         instancia: data.key,
-        mensagem: set_msg,
-        numero: set_to,
+        mensagem: mensagem,
+        numero: numero,
         token: token,
       });
     }
 
     return {
-      set_msg,
+      numero,
       urls,
       base64Urls,
     };

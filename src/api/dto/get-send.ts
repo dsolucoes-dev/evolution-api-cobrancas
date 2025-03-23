@@ -9,11 +9,11 @@ export class sendMessageQueryParams {
 
   @ApiProperty()
   @IsString()
-  set_to: string;
+  numero: string;
 
   @ApiProperty()
   @IsString()
-  set_msg: string;
+  mensagem: string;
 
   @ApiProperty()
   @IsString()

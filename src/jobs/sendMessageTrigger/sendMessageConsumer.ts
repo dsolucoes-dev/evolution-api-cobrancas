@@ -27,6 +27,10 @@ export class sendMessageTriggerConsumer {
     const urls = this.extractUrlsFromMessage(mensagem);
     const base64Urls = [];
 
+    console.log('Enviando mensagem:', mensagem);
+    
+    
+
     if (gerar_pdf === 'sim') {
       if (urls.length > 0) {
         for (const url of urls) {

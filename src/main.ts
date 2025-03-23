@@ -15,6 +15,8 @@ async function bootstrap() {
     }),
     )
 
+  app.enableCors();
+
   const config = new DocumentBuilder()
     .setTitle('Evalue Chat Cobrança API')
     .setDescription('API para gerenciamento de cobranças')

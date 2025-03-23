@@ -5,7 +5,7 @@ import { sendMessageTriggerProducerService } from 'src/jobs/sendMessageTrigger/s
 import { ApiService } from './api.service';
 import { sendMessageQueryParams } from './dto/get-send';
 
-@Controller('api')
+@Controller('/')
 export class ApiController {
   constructor(private readonly apiService: ApiService,     private sendMessageTriggerProducerService: sendMessageTriggerProducerService,
   ) {}

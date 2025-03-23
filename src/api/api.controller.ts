@@ -1,25 +1,28 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { Response } from 'express';
+import { sendMessageTriggerProducerService } from 'src/jobs/sendMessageTrigger/sendMessageProducer';
 import { ApiService } from './api.service';
 import { sendMessageQueryParams } from './dto/get-send';
 
 @Controller('api')
 export class ApiController {
-  constructor(private readonly apiService: ApiService) {}
+  constructor(private readonly apiService: ApiService,     private sendMessageTriggerProducerService: sendMessageTriggerProducerService,
+  ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Listar produtos com filtros' })
+  @ApiOperation({ summary: 'Chamada api via whatsapp' })
   @ApiOkResponse({
-    description: 'Lista de produtos retornada com sucesso',
+    description: 'retorna item a fila',
   })
   async sendManual(
     @Query() query: sendMessageQueryParams,
     @Res() res: Response,
   ) {
     try {
-       await this.apiService.sendManual(query);
-       res.status(200).json({ message: 'Mensagem enviada com sucesso' });
+
+      const id = await this.sendMessageTriggerProducerService.sendMessageTriggerJob(query);
+        res.status(200).send(`queued job with id: ${id}`);
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }

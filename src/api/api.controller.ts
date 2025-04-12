@@ -20,6 +20,9 @@ export class ApiController {
     @Res() res: Response,
   ) {
     try {
+      
+      console.log('Enviando mensagem:', query.mensagem);
+      
 
       const id = await this.sendMessageTriggerProducerService.sendMessageTriggerJob(query);
         res.status(200).send(`Mensagem enviada com sucesso, id: ${id}`);

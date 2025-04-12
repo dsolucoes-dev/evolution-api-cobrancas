@@ -28,41 +28,22 @@ export class sendMessageTriggerConsumer {
     const base64Urls = [];
 
     console.log('Enviando mensagem:', mensagem);
-    
-    
 
-    if (gerar_pdf === 'sim') {
-      if (urls.length > 0) {
-        for (const url of urls) {
-          try {
-            const base64Data = await this.downloadAndConvertToBase64(url, true);
-            base64Urls.push({
-              originalUrl: url,
-              base64Data: base64Data,
-            });
-          } catch (error) {
-            console.error(`Erro ao baixar a URL ${url}:`, error.message);
-          }
-        }
-      }
-    } else {
-      if (urls.length > 0) {
-        for (const url of urls) {
-          try {
-            const base64Data = await this.downloadAndConvertToBase64(url, false);
-            base64Urls.push({
-              originalUrl: url,
-              base64Data: base64Data,
-            });
-          } catch (error) {
-            console.error(`Erro ao baixar a URL ${url}:`, error.message);
-          }
+    if (urls.length > 0) {
+      for (const url of urls) {
+        try {
+          const base64Data = await this.downloadAndConvertToBase64(url, gerar_pdf === 'sim');
+          base64Urls.push({
+            originalUrl: url,
+            base64Data: base64Data,
+          });
+        } catch (error) {
+          console.error(`Erro ao baixar a URL ${url}:`, error.message);
         }
       }
     }
 
     console.log(base64Urls.length, gerar_pdf);
-    
     
     if (base64Urls.length > 0 && gerar_pdf === 'sim') {
       console.log('Enviando mensagem com media');
@@ -89,37 +70,56 @@ export class sendMessageTriggerConsumer {
     };
   }
 
-  /**
-   * Extrai todas as URLs de uma string
-   * @param message - A mensagem de texto para extrair URLs
-   * @returns Um array contendo todas as URLs encontradas na mensagem
-   */
   private extractUrlsFromMessage(message: string): string[] {
     if (!message) return [];
-    // Regex para encontrar URLs (suporta HTTP, HTTPS, FTP e URLs sem protocolo)
     const urlRegex =
       /(https?:\/\/|www\.)[^\s,()<>]+(?:\([\w\d]+\)|([^,()<>!\s]|\([^,()<>!\s]*\)))/gi;
-    // Encontrar todas as ocorrências da regex na mensagem
     const matches = message.match(urlRegex);
-    // Retornar array vazio se não encontrar URLs
     return matches || [];
   }
 
-  /**
-   * Baixa uma URL e converte o conteúdo para base64
-   * @param url - A URL para ser baixada
-   * @param convertToPdf - Indica se deve converter o conteúdo HTML para PDF
-   * @returns Uma Promise com a string em formato base64
-   */
+  private async isPdfUrl(url: string): Promise<boolean> {
+    try {
+      const validUrl = url.startsWith('http') ? url : `https://${url}`;
+      
+      if (validUrl.toLowerCase().endsWith('.pdf')) {
+        return true;
+      }
+
+      const response = await firstValueFrom(
+        this.httpService.head(validUrl)
+      );
+      
+      const contentType = response.headers['content-type'];
+      return contentType && contentType.includes('application/pdf');
+    } catch (error) {
+      this.logger.error(`Erro ao verificar se URL é PDF: ${error.message}`);
+      return false;
+    }
+  }
+
   private async downloadAndConvertToBase64(url: string, convertToPdf: boolean = false): Promise<string> {
-    // Garantir que a URL tenha o protocolo
     const validUrl = url.startsWith('http') ? url : `https://${url}`;
     
     this.logger.log(`Starting to process URL: ${validUrl}`);
-    this.logger.log(`Convert to PDF: ${convertToPdf}`);
-
+    
     try {
-      if (convertToPdf) {
+      // Verifica se a URL é um PDF
+      const isPdf = await this.isPdfUrl(validUrl);
+      
+      // Se já for um PDF ou não precisar converter para PDF, apenas baixa e converte para base64
+      if (isPdf || !convertToPdf) {
+        this.logger.log('Making HTTP request for direct download...');
+        const response = await firstValueFrom(
+          this.httpService.get(validUrl, {
+            responseType: 'arraybuffer',
+          }),
+        );
+        
+        this.logger.log('Content downloaded successfully');
+        return Buffer.from(response.data).toString('base64');
+      } else {
+        // Se não for PDF e precisar converter, usa o Puppeteer
         this.logger.log('Launching Puppeteer browser...');
         const browser = await puppeteer.launch({
           headless: true,
@@ -150,16 +150,6 @@ export class sendMessageTriggerConsumer {
         this.logger.log('PDF generated successfully');
         
         return Buffer.from(pdfBuffer).toString('base64');
-      } else {
-        this.logger.log('Making HTTP request...');
-        const response = await firstValueFrom(
-          this.httpService.get(validUrl, {
-            responseType: 'arraybuffer',
-          }),
-        );
-        
-        this.logger.log('Content downloaded successfully');
-        return Buffer.from(response.data).toString('base64');
       }
     } catch (error) {
       this.logger.error(`Error processing URL ${validUrl}: ${error.message}`);

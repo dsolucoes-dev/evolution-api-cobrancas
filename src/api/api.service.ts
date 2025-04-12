@@ -50,7 +50,6 @@ export class ApiService {
     }
     
     if (base64Urls.length > 0 && gerar_pdf === 'sim') {
-      console.log('Enviando mensagem com media');
       await this.evalueChatService.sendMessageMedia({
         instancia: data.key,
         mensagem: mensagem,

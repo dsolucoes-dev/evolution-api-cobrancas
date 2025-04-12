@@ -27,7 +27,6 @@ export class sendMessageTriggerConsumer {
     const urls = this.extractUrlsFromMessage(mensagem);
     const base64Urls = [];
 
-    console.log('Enviando mensagem:', mensagem);
 
     if (urls.length > 0) {
       for (const url of urls) {
@@ -43,10 +42,8 @@ export class sendMessageTriggerConsumer {
       }
     }
 
-    console.log(base64Urls.length, gerar_pdf);
     
     if (base64Urls.length > 0 && gerar_pdf === 'sim') {
-      console.log('Enviando mensagem com media');
       await this.evalueChatService.sendMessageMedia({
         instancia: data.key,
         mensagem: mensagem,

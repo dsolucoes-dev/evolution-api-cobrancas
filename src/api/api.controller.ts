@@ -21,7 +21,6 @@ export class ApiController {
   ) {
     try {
       
-      console.log('Enviando mensagem:', query.mensagem);
       
 
       const id = await this.sendMessageTriggerProducerService.sendMessageTriggerJob(query);

@@ -15,11 +15,6 @@ export class sendMessageTriggerProducerService {
       backoff: 5000,
     });
 
-  
-
-    // const jobs = await this.sendMessageTriggerQueue.getJobs(['completed', 'failed']);
-    // console.log('Jobs in the queue:', jobs);
-    // console.log('Job added to queue');
     
     return `${data.numero}@${d.id}`;
   }

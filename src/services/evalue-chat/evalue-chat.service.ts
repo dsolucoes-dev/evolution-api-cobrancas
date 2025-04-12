@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { firstValueFrom } from 'rxjs';
 import { SendMediaMessage, SendPlaneText } from './dto/sendPlaneText';
 
@@ -9,23 +10,21 @@ export class EvalueChatService {
 
   async sendMessage(data: SendPlaneText) {
     try {
-      const isValidNumberWithCountryCode = /^[1-9]\d{1,14}$/;
-
-      const numberWithCountryCode = data.numero.startsWith('55') 
-        ? data.numero 
+      const numberWithCountryCode = data.numero.startsWith('55')
+        ? data.numero
         : `55${data.numero}`;
 
       await firstValueFrom(
         this.httpService.post(
           `/message/sendText/${data.instancia}`,
           {
-        number: numberWithCountryCode,
-        text: data.mensagem,
+            number: numberWithCountryCode,
+            text: data.mensagem,
           },
           {
-        headers: {
-          apikey: `${data.token}`,
-        },
+            headers: {
+              apikey: `${data.token}`,
+            },
           },
         ),
       );
@@ -37,14 +36,10 @@ export class EvalueChatService {
   }
 
   async sendMessageMedia(data: SendMediaMessage) {
-    
     try {
-      const isValidNumberWithCountryCode = /^\[1-9]\d{1,14}$/;
-      
-      const numberWithCountryCode = data.numero.startsWith('55') 
-      ? data.numero 
-      : `55${data.numero}`;
-
+      const numberWithCountryCode = data.numero.startsWith('55')
+        ? data.numero
+        : `55${data.numero}`;
 
       await firstValueFrom(
         this.httpService.post(
@@ -55,7 +50,7 @@ export class EvalueChatService {
             mimetype: 'application/pdf',
             caption: data.mensagem,
             media: data.media[0],
-            fileName: 'Fatura.pdf',
+            fileName: randomUUID(),
           },
           {
             headers: {
@@ -66,7 +61,7 @@ export class EvalueChatService {
       );
     } catch (error) {
       console.log('error', error.response.data.response || error);
-      
+
       throw new Error(JSON.stringify(error.response.data) || error);
     }
   }

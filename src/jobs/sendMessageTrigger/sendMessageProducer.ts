@@ -2,7 +2,6 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
 
-
 @Injectable()
 export class sendMessageTriggerProducerService {
   constructor(
@@ -10,12 +9,15 @@ export class sendMessageTriggerProducerService {
   ) {}
 
   async sendMessageTriggerJob(data: any) {
-   const  d = await this.sendMessageTriggerQueue.add('send-message-trigger-job', data, {
-      attempts: 3,
-      backoff: 5000,
-    });
+    const d = await this.sendMessageTriggerQueue.add(
+      'send-message-trigger-job',
+      data,
+      {
+        attempts: 3,
+        backoff: 5000,
+      },
+    );
 
-    
     return `${data.numero}@${d.id}`;
   }
 }

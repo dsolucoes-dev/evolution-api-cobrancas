@@ -13,8 +13,8 @@ import { ApiService } from './api.service';
     EvalueChatModule,
     BullModule.forRoot({
       limiter: {
-        duration: 1000,
-        max: 10,
+        duration: 5000,
+        max: 5,
       },
       redis: {
         host: process.env.REDIS_HOST,

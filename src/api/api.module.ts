@@ -8,19 +8,31 @@ import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
 
 @Module({
-  imports: [HttpModule, EvalueChatModule, BullModule.forRoot({
-    redis: {
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379,
-      password: process.env.REDIS_PASSWORD,
-      username: process.env.REDIS_USERNAME,
-      db: parseInt(process.env.REDIS_DB) || 0,
-    },
-  }),
-  BullModule.registerQueue({
-    name: 'send-message-trigger',
-  }),],
+  imports: [
+    HttpModule,
+    EvalueChatModule,
+    BullModule.forRoot({
+      limiter: {
+        duration: 1000,
+        max: 10,
+      },
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379,
+        password: process.env.REDIS_PASSWORD,
+        username: process.env.REDIS_USERNAME,
+        db: parseInt(process.env.REDIS_DB) || 0,
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'send-message-trigger',
+    }),
+  ],
   controllers: [ApiController],
-  providers: [ApiService, sendMessageTriggerConsumer, sendMessageTriggerProducerService],
+  providers: [
+    ApiService,
+    sendMessageTriggerConsumer,
+    sendMessageTriggerProducerService,
+  ],
 })
 export class ApiModule {}

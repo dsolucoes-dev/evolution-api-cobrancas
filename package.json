@@ -28,7 +28,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
-    "@nestjs/swagger": "^11.0.7",
+    "@nestjs/swagger": "^7.4.2",
     "axios": "^1.8.4",
     "bull": "^4.16.5",
     "bullmq": "^5.44.3",

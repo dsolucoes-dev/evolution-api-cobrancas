@@ -25,3 +25,32 @@ export class sendMessageQueryParams {
   @IsOptional()
   gerar_pdf: string;
 }
+
+export class sendMessageQueryParamsIXC{
+
+  @ApiProperty()
+  @IsString()
+  app: string;
+
+  @ApiProperty()
+  @IsString()
+  u: string;
+
+  @ApiProperty()
+  @IsString()
+  h: string;
+
+
+  @ApiProperty()
+  @IsString()
+  op: string;
+
+  @ApiProperty()
+  @IsString()
+  to: string;
+
+  @ApiProperty()
+  @IsString()
+  msg: string;
+  
+}

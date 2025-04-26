@@ -13,7 +13,8 @@ export class sendMessageTriggerProducerService {
       'send-message-trigger-job',
       data,
       {
-        attempts: 3,
+        attempts: 1,
+        delay: 3000,
         backoff: 5000,
       },
     );

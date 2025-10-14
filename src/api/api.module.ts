@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { sendMessageTriggerConsumer } from 'src/jobs/sendMessageTrigger/sendMessageConsumer';
 import { sendMessageTriggerProducerService } from 'src/jobs/sendMessageTrigger/sendMessageProducer';
 import { EvalueChatModule } from 'src/services/evalue-chat/evalue-chat.module';
+import { PrismaService } from 'src/services/prisma.service';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
 
@@ -34,6 +35,7 @@ import { ApiService } from './api.service';
     ApiService,
     sendMessageTriggerConsumer,
     sendMessageTriggerProducerService,
+    PrismaService
   ],
 })
 export class ApiModule {}

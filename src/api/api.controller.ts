@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { sendMessageTriggerProducerService } from 'src/jobs/sendMessageTrigger/sendMessageProducer';
 import {
@@ -8,9 +8,11 @@ import {
 } from './dto/get-send';
 
 @Controller('/')
+@ApiTags('Send Message')
 export class ApiController {
   constructor(
     private sendMessageTriggerProducerService: sendMessageTriggerProducerService,
+    private apiService: ApiService,
   ) {}
 
   @Get()
@@ -106,5 +108,15 @@ export class ApiController {
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
+  }
+
+
+  @Get('/evolution/:token/:key/metricas')
+  @ApiOperation({ summary: 'Chamada api via whatsapp via IXC' })
+  @ApiOkResponse({
+    description: 'retorna item a fila',
+  })
+  async getMetricas(@Param('token') token: string, @Param('key') key: string) {
+    return this.apiService.getMetricas(token, key);
   }
 }

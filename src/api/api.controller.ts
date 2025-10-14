@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { sendMessageTriggerProducerService } from 'src/jobs/sendMessageTrigger/sendMessageProducer';
+import { ApiService } from './api.service';
 import {
   sendMessageQueryParams,
   sendMessageQueryParamsIXC,

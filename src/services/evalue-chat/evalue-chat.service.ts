@@ -10,9 +10,14 @@ export class EvalueChatService {
 
   async sendMessage(data: SendPlaneText) {
     try {
-      const numberWithCountryCode = data.numero.startsWith('55')
-        ? data.numero
-        : `55${data.numero}`;
+      let numberWithCountryCode: string;
+      if (data.numero.includes('@')) {
+        numberWithCountryCode = data.numero;
+      } else if (data.numero.startsWith('55')) {
+        numberWithCountryCode = data.numero;
+      } else {
+        numberWithCountryCode = `55${data.numero}`;
+      }
 
       await firstValueFrom(
         this.httpService.post(
@@ -25,14 +30,13 @@ export class EvalueChatService {
             headers: {
               apikey: `${data.token}`,
             },
-          }
-        )
+          },
+        ),
       );
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log('error', error);
+      console.log(JSON.stringify(error.response.data.response.message));
 
-      throw new Error(JSON.stringify(error.response.data) || error.message);
+      throw new Error(error.message);
     }
   }
 
@@ -57,14 +61,42 @@ export class EvalueChatService {
             headers: {
               apikey: `${data.token}`,
             },
-          }
-        )
+          },
+        ),
       );
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log('error', error.response.data.response || error);
+      console.log('========== ERRO COMPLETO sendMessageMedia ==========');
+      // eslint-disable-next-line no-console
+      console.log('error.response?.status:', error?.response?.status);
+      // eslint-disable-next-line no-console
+      console.log('error.response?.statusText:', error?.response?.statusText);
+      // eslint-disable-next-line no-console
+      console.log(
+        'error.response?.data:',
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+      // eslint-disable-next-line no-console
+      console.log('error.response?.headers:', error?.response?.headers);
+      // eslint-disable-next-line no-console
+      console.log('error.message:', error?.message);
+      // eslint-disable-next-line no-console
+      console.log(
+        'error completo:',
+        JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+      );
+      // eslint-disable-next-line no-console
+      console.log('====================================================');
 
-      throw new Error(JSON.stringify(error.response.data) || error);
+      const errorData = error?.response?.data || {};
+      const errorMessage =
+        errorData?.message || error?.message || 'Erro desconhecido';
+
+      throw new Error(
+        typeof errorMessage === 'string'
+          ? errorMessage
+          : JSON.stringify(errorMessage),
+      );
     }
   }
 }

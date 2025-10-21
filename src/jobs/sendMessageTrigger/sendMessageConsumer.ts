@@ -13,7 +13,7 @@ export class sendMessageTriggerConsumer {
 
   constructor(
     private readonly httpService: HttpService,
-    private readonly evalueChatService: EvalueChatService
+    private readonly evalueChatService: EvalueChatService,
   ) {}
 
   @Process('send-message-trigger-job')
@@ -32,7 +32,7 @@ export class sendMessageTriggerConsumer {
         try {
           const base64Data = await this.downloadAndConvertToBase64(
             url,
-            gerar_pdf === 'sim'
+            gerar_pdf === 'sim',
           );
           base64Urls.push({
             originalUrl: url,
@@ -51,7 +51,7 @@ export class sendMessageTriggerConsumer {
         mensagem: mensagem,
         numero: numero,
         token: token,
-        media: base64Urls.map(url => url.base64Data),
+        media: base64Urls.map((url) => url.base64Data),
       });
     } else {
       await this.evalueChatService.sendMessage({
@@ -97,7 +97,7 @@ export class sendMessageTriggerConsumer {
 
   private async downloadAndConvertToBase64(
     url: string,
-    convertToPdf: boolean = false
+    convertToPdf: boolean = false,
   ): Promise<string> {
     const validUrl = url.startsWith('http') ? url : `https://${url}`;
 
@@ -113,7 +113,7 @@ export class sendMessageTriggerConsumer {
         const response = await firstValueFrom(
           this.httpService.get(validUrl, {
             responseType: 'arraybuffer',
-          })
+          }),
         );
 
         this.logger.log('Content downloaded successfully');

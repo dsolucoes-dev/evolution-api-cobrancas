@@ -13,7 +13,7 @@ import {
 export class ApiController {
   constructor(
     private sendMessageTriggerProducerService: sendMessageTriggerProducerService,
-    private apiService: ApiService
+    private apiService: ApiService,
   ) {}
 
   @Get()
@@ -23,12 +23,12 @@ export class ApiController {
   })
   async sendManual(
     @Query() query: sendMessageQueryParams,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     try {
       const id =
         await this.sendMessageTriggerProducerService.sendMessageTriggerJob(
-          query
+          query,
         );
       res.status(200).send(`Mensagem enviada com sucesso, id: ${id}`);
     } catch (error) {
@@ -43,7 +43,7 @@ export class ApiController {
   })
   async sendMessageManual(
     @Query() query: sendMessageQueryParamsIXC,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     try {
       const { u, h, to, msg } = query;
@@ -58,7 +58,7 @@ export class ApiController {
 
       const id =
         await this.sendMessageTriggerProducerService.sendMessageTriggerJob(
-          data
+          data,
         );
 
       return res.status(200).json({
@@ -85,7 +85,7 @@ export class ApiController {
   })
   async sendPostMessageManual(
     @Body() body: sendMessageQueryParams,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     try {
       const { key, numero, mensagem, token } = body;
@@ -100,7 +100,7 @@ export class ApiController {
 
       const id =
         await this.sendMessageTriggerProducerService.sendMessageTriggerJob(
-          data
+          data,
         );
 
       return res.status(200).json({
@@ -120,11 +120,14 @@ export class ApiController {
   async getMetricas(
     @Param('token') token: string,
     @Param('key') key: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     try {
-      return this.apiService.getMetricas(token, key);
+      const resultado = await this.apiService.getMetricas(token, key);
+      return res.status(200).json(resultado);
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
       return res.status(400).send(JSON.stringify({ error: error.message }));
     }
   }

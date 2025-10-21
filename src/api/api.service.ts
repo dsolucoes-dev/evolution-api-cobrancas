@@ -11,7 +11,7 @@ export class ApiService {
   constructor(
     private readonly httpService: HttpService,
     private readonly evalueChatService: EvalueChatService,
-    private readonly prismaService: PrismaService
+    private readonly prismaService: PrismaService,
   ) {}
 
   async sendManual(data: sendMessageQueryParams) {
@@ -34,7 +34,7 @@ export class ApiService {
             // eslint-disable-next-line no-console
             console.error(
               `Erro ao baixar a URL ${url}:`,
-              JSON.stringify(error)
+              JSON.stringify(error),
             );
           }
         }
@@ -45,7 +45,7 @@ export class ApiService {
           try {
             const base64Data = await this.downloadAndConvertToBase64(
               url,
-              false
+              false,
             );
             base64Urls.push({
               originalUrl: url,
@@ -55,7 +55,7 @@ export class ApiService {
             // eslint-disable-next-line no-console
             console.error(
               `Erro ao baixar a URL ${url}:`,
-              JSON.stringify(error)
+              JSON.stringify(error),
             );
           }
         }
@@ -68,7 +68,7 @@ export class ApiService {
         mensagem: mensagem,
         numero: numero,
         token: token,
-        media: base64Urls.map(url => url.base64Data),
+        media: base64Urls.map((url) => url.base64Data),
       });
     } else {
       await this.evalueChatService.sendMessage({
@@ -110,7 +110,7 @@ export class ApiService {
    */
   private async downloadAndConvertToBase64(
     url: string,
-    convertToPdf: boolean = false
+    convertToPdf: boolean = false,
   ): Promise<string> {
     // Garantir que a URL tenha o protocolo
     const validUrl = url.startsWith('http') ? url : `https://${url}`;
@@ -153,7 +153,7 @@ export class ApiService {
         const response = await firstValueFrom(
           this.httpService.get(validUrl, {
             responseType: 'arraybuffer',
-          })
+          }),
         );
 
         // Converter o buffer para base64
@@ -167,229 +167,70 @@ export class ApiService {
   }
 
   async getMetricas(token: string, key: string) {
-    // Buscar a instância
-    const evolutionInstance = await this.prismaService.instance.findFirst({
-      where: {
-        token: token,
-        name: key,
-      },
-    });
+    try {
+      // Buscar a instância
+      const evolutionInstance = await this.prismaService.instance.findFirst({
+        where: {
+          token: token,
+          name: key,
+        },
+      });
 
-    if (!evolutionInstance) {
-      throw new NotFoundException('Evolution instance not found');
+      if (!evolutionInstance) {
+        throw new NotFoundException('Evolution instance not found');
+      }
+
+      // Buscar apenas as últimas mensagens enviadas
+      const ultimasMensagensEnviadas =
+        await this.prismaService.message.findMany({
+          where: {
+            instanceId: evolutionInstance.id,
+            key: {
+              path: ['fromMe'],
+              equals: true,
+            },
+          },
+          orderBy: {
+            messageTimestamp: 'desc',
+          },
+          take: 30,
+          select: {
+            id: true,
+            key: true,
+            pushName: true,
+            messageType: true,
+            message: true,
+            messageTimestamp: true,
+            status: true,
+          },
+        });
+
+      return {
+        instancia: {
+          id: evolutionInstance.id,
+          nome: evolutionInstance.name,
+          numero: evolutionInstance.number,
+          statusConexao: evolutionInstance.connectionStatus,
+          criadoEm: evolutionInstance.createdAt,
+        },
+        mensagens: {
+          ultimasMensagensEnviadas: ultimasMensagensEnviadas.map((msg) => ({
+            id: msg.id,
+            remoteJid: msg.key['remoteJid'],
+            pushName: msg.pushName,
+            tipo: msg.messageType,
+            conteudo: msg.message,
+            timestamp: new Date(msg.messageTimestamp * 1000).toISOString(),
+            status: msg.status,
+          })),
+        },
+      };
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erro ao buscar métricas:', error);
+
+      // Re-throw o erro para que seja tratado pelo NestJS
+      throw error;
     }
-
-    // Buscar total de mensagens
-    const totalMensagens = await this.prismaService.message.count({
-      where: {
-        instanceId: evolutionInstance.id,
-      },
-    });
-
-    // Buscar mensagens enviadas (fromMe: true)
-    const mensagensEnviadas = await this.prismaService.message.count({
-      where: {
-        instanceId: evolutionInstance.id,
-        key: {
-          path: ['fromMe'],
-          equals: true,
-        },
-      },
-    });
-
-    // Buscar mensagens recebidas (fromMe: false)
-    const mensagensRecebidas = await this.prismaService.message.count({
-      where: {
-        instanceId: evolutionInstance.id,
-        key: {
-          path: ['fromMe'],
-          equals: false,
-        },
-      },
-    });
-
-    // Buscar últimas 20 mensagens enviadas
-    const ultimasMensagensEnviadas = await this.prismaService.message.findMany({
-      where: {
-        instanceId: evolutionInstance.id,
-        key: {
-          path: ['fromMe'],
-          equals: true,
-        },
-      },
-      orderBy: {
-        messageTimestamp: 'desc',
-      },
-      take: 20,
-      select: {
-        id: true,
-        key: true,
-        pushName: true,
-        messageType: true,
-        message: true,
-        messageTimestamp: true,
-        status: true,
-      },
-    });
-
-    // Buscar total de contatos
-    const totalContatos = await this.prismaService.contact.count({
-      where: {
-        instanceId: evolutionInstance.id,
-      },
-    });
-
-    // Buscar total de chats
-    const totalChats = await this.prismaService.chat.count({
-      where: {
-        instanceId: evolutionInstance.id,
-      },
-    });
-
-    // Buscar total de mensagens não lidas
-    const totalMensagensNaoLidas = await this.prismaService.chat.aggregate({
-      where: {
-        instanceId: evolutionInstance.id,
-      },
-      _sum: {
-        unreadMessages: true,
-      },
-    });
-
-    // Estatísticas de mensagens por tipo
-    const mensagensPorTipo = await this.prismaService.message.groupBy({
-      by: ['messageType'],
-      where: {
-        instanceId: evolutionInstance.id,
-      },
-      _count: {
-        messageType: true,
-      },
-    });
-
-    // Mensagens das últimas 24 horas
-    const umDiaAtras = Math.floor(Date.now() / 1000) - 86400;
-    const mensagensUltimas24h = await this.prismaService.message.count({
-      where: {
-        instanceId: evolutionInstance.id,
-        messageTimestamp: {
-          gte: umDiaAtras,
-        },
-      },
-    });
-
-    // Mensagens enviadas nas últimas 24 horas
-    const mensagensEnviadas24h = await this.prismaService.message.count({
-      where: {
-        instanceId: evolutionInstance.id,
-        key: {
-          path: ['fromMe'],
-          equals: true,
-        },
-        messageTimestamp: {
-          gte: umDiaAtras,
-        },
-      },
-    });
-
-    // Mensagens dos últimos 7 dias
-    const seteDiasAtras = Math.floor(Date.now() / 1000) - 604800;
-    const mensagensUltimos7dias = await this.prismaService.message.count({
-      where: {
-        instanceId: evolutionInstance.id,
-        messageTimestamp: {
-          gte: seteDiasAtras,
-        },
-      },
-    });
-
-    // Mensagens enviadas nos últimos 7 dias
-    const mensagensEnviadas7dias = await this.prismaService.message.count({
-      where: {
-        instanceId: evolutionInstance.id,
-        key: {
-          path: ['fromMe'],
-          equals: true,
-        },
-        messageTimestamp: {
-          gte: seteDiasAtras,
-        },
-      },
-    });
-
-    // Mensagens dos últimos 30 dias
-    const trintaDiasAtras = Math.floor(Date.now() / 1000) - 2592000;
-    const mensagensUltimos30dias = await this.prismaService.message.count({
-      where: {
-        instanceId: evolutionInstance.id,
-        messageTimestamp: {
-          gte: trintaDiasAtras,
-        },
-      },
-    });
-
-    // Mensagens enviadas nos últimos 30 dias
-    const mensagensEnviadas30dias = await this.prismaService.message.count({
-      where: {
-        instanceId: evolutionInstance.id,
-        key: {
-          path: ['fromMe'],
-          equals: true,
-        },
-        messageTimestamp: {
-          gte: trintaDiasAtras,
-        },
-      },
-    });
-
-    return {
-      instancia: {
-        id: evolutionInstance.id,
-        nome: evolutionInstance.name,
-        numero: evolutionInstance.number,
-        statusConexao: evolutionInstance.connectionStatus,
-        criadoEm: evolutionInstance.createdAt,
-      },
-      mensagens: {
-        total: totalMensagens,
-        enviadas: mensagensEnviadas,
-        recebidas: mensagensRecebidas,
-        naoLidas: totalMensagensNaoLidas._sum.unreadMessages || 0,
-        ultimas24h: {
-          total: mensagensUltimas24h,
-          enviadas: mensagensEnviadas24h,
-          recebidas: mensagensUltimas24h - mensagensEnviadas24h,
-        },
-        ultimos7dias: {
-          total: mensagensUltimos7dias,
-          enviadas: mensagensEnviadas7dias,
-          recebidas: mensagensUltimos7dias - mensagensEnviadas7dias,
-        },
-        ultimos30dias: {
-          total: mensagensUltimos30dias,
-          enviadas: mensagensEnviadas30dias,
-          recebidas: mensagensUltimos30dias - mensagensEnviadas30dias,
-        },
-        porTipo: mensagensPorTipo.map(tipo => ({
-          tipo: tipo.messageType,
-          quantidade: tipo._count.messageType,
-        })),
-      },
-      ultimasMensagensEnviadas: ultimasMensagensEnviadas.map(msg => ({
-        id: msg.id,
-        remoteJid: msg.key['remoteJid'],
-        pushName: msg.pushName,
-        tipo: msg.messageType,
-        conteudo: msg.message,
-        timestamp: new Date(msg.messageTimestamp * 1000).toISOString(),
-        status: msg.status,
-      })),
-      contatos: {
-        total: totalContatos,
-      },
-      chats: {
-        total: totalChats,
-      },
-    };
   }
 }

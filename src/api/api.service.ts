@@ -15,7 +15,7 @@ export class ApiService {
   ) {}
 
   async sendManual(data: sendMessageQueryParams) {
-    const { gerar_pdf, mensagem,numero, token, key } = data;
+    const { gerar_pdf, mensagem, numero, token, key } = data;
     // Extrair URLs da mensagem
     const urls = this.extractUrlsFromMessage(mensagem);
     // Array para armazenar as URLs em formato base64
@@ -31,7 +31,10 @@ export class ApiService {
               base64Data: base64Data,
             });
           } catch (error) {
-            console.error(`Erro ao baixar a URL ${url}:`, JSON.stringify(error));
+            console.error(
+              `Erro ao baixar a URL ${url}:`,
+              JSON.stringify(error),
+            );
           }
         }
       }
@@ -39,21 +42,27 @@ export class ApiService {
       if (urls.length > 0) {
         for (const url of urls) {
           try {
-            const base64Data = await this.downloadAndConvertToBase64(url, false);
+            const base64Data = await this.downloadAndConvertToBase64(
+              url,
+              false,
+            );
             base64Urls.push({
               originalUrl: url,
               base64Data: base64Data,
             });
           } catch (error) {
-            console.error(`Erro ao baixar a URL ${url}:`, JSON.stringify(error));
+            console.error(
+              `Erro ao baixar a URL ${url}:`,
+              JSON.stringify(error),
+            );
           }
         }
       }
     }
-    
+
     if (base64Urls.length > 0 && gerar_pdf === 'sim') {
       await this.evalueChatService.sendMessageMedia({
-        instancia: data.key,
+        instancia: key,
         mensagem: mensagem,
         numero: numero,
         token: token,
@@ -97,7 +106,10 @@ export class ApiService {
    * @param convertToPdf - Indica se deve converter o conteúdo HTML para PDF
    * @returns Uma Promise com a string em formato base64
    */
-  private async downloadAndConvertToBase64(url: string, convertToPdf: boolean = false): Promise<string> {
+  private async downloadAndConvertToBase64(
+    url: string,
+    convertToPdf: boolean = false,
+  ): Promise<string> {
     // Garantir que a URL tenha o protocolo
     const validUrl = url.startsWith('http') ? url : `https://${url}`;
 
@@ -108,15 +120,15 @@ export class ApiService {
           headless: true,
           args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
-        
+
         const page = await browser.newPage();
-        
+
         // Navegar até a URL
         await page.goto(validUrl, {
           waitUntil: 'networkidle2', // Espera até que a página esteja carregada
           timeout: 30000, // Tempo limite de 30 segundos
         });
-        
+
         // Gerar o PDF
         const pdfBuffer = await page.pdf({
           format: 'A4',
@@ -128,10 +140,10 @@ export class ApiService {
             left: '20px',
           },
         });
-        
+
         // Fechar o navegador
         await browser.close();
-        
+
         // Converter o buffer do PDF para base64
         return Buffer.from(pdfBuffer).toString('base64');
       } else {
@@ -141,7 +153,7 @@ export class ApiService {
             responseType: 'arraybuffer',
           }),
         );
-        
+
         // Converter o buffer para base64
         return Buffer.from(response.data).toString('base64');
       }

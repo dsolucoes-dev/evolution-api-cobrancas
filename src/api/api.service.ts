@@ -31,7 +31,7 @@ export class ApiService {
               base64Data: base64Data,
             });
           } catch (error) {
-            console.error(`Erro ao baixar a URL ${url}:`, error.message);
+            console.error(`Erro ao baixar a URL ${url}:`, JSON.stringify(error));
           }
         }
       }
@@ -45,7 +45,7 @@ export class ApiService {
               base64Data: base64Data,
             });
           } catch (error) {
-            console.error(`Erro ao baixar a URL ${url}:`, error.message);
+            console.error(`Erro ao baixar a URL ${url}:`, JSON.stringify(error));
           }
         }
       }

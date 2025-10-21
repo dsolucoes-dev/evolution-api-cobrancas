@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+*.lock
+
+# Build outputs
+dist/
+build/
+generated/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env*
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+
+# Prisma generated files
+generated/prisma/

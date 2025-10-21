@@ -1,11 +1,20 @@
-
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'dotenv/config';
 import { AppModule } from './app.module';
+import {
+    checkRequiredEnvVars,
+    validateEnvironment,
+} from './config/env.validation';
 
 async function bootstrap() {
+  // Validar variáveis de ambiente antes de inicializar a aplicação
+  // eslint-disable-next-line no-console
+  console.log('🔍 Verificando variáveis de ambiente...');
+  checkRequiredEnvVars();
+  validateEnvironment(process.env);
+
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
@@ -13,7 +22,7 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: false,
     }),
-    )
+  );
 
   app.enableCors();
 

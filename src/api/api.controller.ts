@@ -32,7 +32,7 @@ export class ApiController {
         );
       res.status(200).send(`Mensagem enviada com sucesso, id: ${id}`);
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).send(JSON.stringify({ error: error.message }));
     }
   }
 
@@ -74,7 +74,7 @@ export class ApiController {
         ],
       });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).send(JSON.stringify({ error: error.message }));
     }
   }
 
@@ -107,7 +107,9 @@ export class ApiController {
         id,
       });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res
+        .status(400)
+        .send(JSON.stringify({ error: error.message }));
     }
   }
 
@@ -117,7 +119,11 @@ export class ApiController {
   @ApiOkResponse({
     description: 'retorna item a fila',
   })
-  async getMetricas(@Param('token') token: string, @Param('key') key: string) {
-    return this.apiService.getMetricas(token, key);
+  async getMetricas(@Param('token') token: string, @Param('key') key: string, @Res() res: Response) {
+    try {
+      return this.apiService.getMetricas(token, key);
+    } catch (error) {
+      return res.status(400).send(JSON.stringify({ error: error.message }));
+    }
   }
 }

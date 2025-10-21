@@ -11,7 +11,7 @@ export class ApiService {
   constructor(
     private readonly httpService: HttpService,
     private readonly evalueChatService: EvalueChatService,
-    private readonly prismaService: PrismaService,
+    private readonly prismaService: PrismaService
   ) {}
 
   async sendManual(data: sendMessageQueryParams) {
@@ -31,9 +31,10 @@ export class ApiService {
               base64Data: base64Data,
             });
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error(
               `Erro ao baixar a URL ${url}:`,
-              JSON.stringify(error),
+              JSON.stringify(error)
             );
           }
         }
@@ -44,16 +45,17 @@ export class ApiService {
           try {
             const base64Data = await this.downloadAndConvertToBase64(
               url,
-              false,
+              false
             );
             base64Urls.push({
               originalUrl: url,
               base64Data: base64Data,
             });
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error(
               `Erro ao baixar a URL ${url}:`,
-              JSON.stringify(error),
+              JSON.stringify(error)
             );
           }
         }
@@ -66,7 +68,7 @@ export class ApiService {
         mensagem: mensagem,
         numero: numero,
         token: token,
-        media: base64Urls.map((url) => url.base64Data),
+        media: base64Urls.map(url => url.base64Data),
       });
     } else {
       await this.evalueChatService.sendMessage({
@@ -108,7 +110,7 @@ export class ApiService {
    */
   private async downloadAndConvertToBase64(
     url: string,
-    convertToPdf: boolean = false,
+    convertToPdf: boolean = false
   ): Promise<string> {
     // Garantir que a URL tenha o protocolo
     const validUrl = url.startsWith('http') ? url : `https://${url}`;
@@ -151,13 +153,14 @@ export class ApiService {
         const response = await firstValueFrom(
           this.httpService.get(validUrl, {
             responseType: 'arraybuffer',
-          }),
+          })
         );
 
         // Converter o buffer para base64
         return Buffer.from(response.data).toString('base64');
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(`Erro ao processar a URL ${validUrl}:`, error.message);
       throw error;
     }
@@ -367,12 +370,12 @@ export class ApiService {
           enviadas: mensagensEnviadas30dias,
           recebidas: mensagensUltimos30dias - mensagensEnviadas30dias,
         },
-        porTipo: mensagensPorTipo.map((tipo) => ({
+        porTipo: mensagensPorTipo.map(tipo => ({
           tipo: tipo.messageType,
           quantidade: tipo._count.messageType,
         })),
       },
-      ultimasMensagensEnviadas: ultimasMensagensEnviadas.map((msg) => ({
+      ultimasMensagensEnviadas: ultimasMensagensEnviadas.map(msg => ({
         id: msg.id,
         remoteJid: msg.key['remoteJid'],
         pushName: msg.pushName,

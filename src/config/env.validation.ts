@@ -53,13 +53,13 @@ export function validateEnvironment(config: Record<string, unknown>) {
   });
 
   if (errors.length > 0) {
-    const errorMessages = errors.map((error) => {
+    const errorMessages = errors.map(error => {
       const constraints = Object.values(error.constraints || {});
       return `${error.property}: ${constraints.join(', ')}`;
     });
 
     throw new Error(
-      `❌ Erro na validação das variáveis de ambiente:\n${errorMessages.join('\n')}`,
+      `❌ Erro na validação das variáveis de ambiente:\n${errorMessages.join('\n')}`
     );
   }
 
@@ -82,23 +82,23 @@ export function checkRequiredEnvVars(): void {
   if (missingVars.length > 0) {
     // eslint-disable-next-line no-console
     console.error('❌ Variáveis de ambiente obrigatórias não encontradas:');
-    missingVars.forEach((varName) => {
+    missingVars.forEach(varName => {
       // eslint-disable-next-line no-console
       console.error(`  - ${varName}`);
     });
     // eslint-disable-next-line no-console
     console.error(
-      '\n📝 Certifique-se de criar um arquivo .env com todas as variáveis necessárias.',
+      '\n📝 Certifique-se de criar um arquivo .env com todas as variáveis necessárias.'
     );
     // eslint-disable-next-line no-console
     console.error(
-      '💡 Consulte o arquivo .env.example para ver todas as variáveis requeridas.',
+      '💡 Consulte o arquivo .env.example para ver todas as variáveis requeridas.'
     );
     process.exit(1);
   }
 
   // eslint-disable-next-line no-console
   console.log(
-    '✅ Todas as variáveis de ambiente obrigatórias estão definidas!',
+    '✅ Todas as variáveis de ambiente obrigatórias estão definidas!'
   );
 }

@@ -25,10 +25,11 @@ export class EvalueChatService {
             headers: {
               apikey: `${data.token}`,
             },
-          },
-        ),
+          }
+        )
       );
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log('error', error);
 
       throw new Error(JSON.stringify(error.response.data) || error.message);
@@ -56,10 +57,11 @@ export class EvalueChatService {
             headers: {
               apikey: `${data.token}`,
             },
-          },
-        ),
+          }
+        )
       );
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log('error', error.response.data.response || error);
 
       throw new Error(JSON.stringify(error.response.data) || error);

@@ -14,7 +14,7 @@ import { ApiService } from './api.service';
     EvalueChatModule,
     BullModule.forRoot({
       limiter: {
-        bounceBack:true,
+        bounceBack: true,
         duration: 3000,
         max: 1,
       },
@@ -35,7 +35,7 @@ import { ApiService } from './api.service';
     ApiService,
     sendMessageTriggerConsumer,
     sendMessageTriggerProducerService,
-    PrismaService
+    PrismaService,
   ],
 })
 export class ApiModule {}

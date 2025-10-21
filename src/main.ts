@@ -4,8 +4,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'dotenv/config';
 import { AppModule } from './app.module';
 import {
-    checkRequiredEnvVars,
-    validateEnvironment,
+  checkRequiredEnvVars,
+  validateEnvironment,
 } from './config/env.validation';
 
 async function bootstrap() {
@@ -21,7 +21,7 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: false,
-    }),
+    })
   );
 
   app.enableCors();

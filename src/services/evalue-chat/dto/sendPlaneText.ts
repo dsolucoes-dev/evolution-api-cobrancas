@@ -5,7 +5,6 @@ export interface SendPlaneText {
   mensagem: string;
 }
 
-
 export interface SendMediaMessage extends SendPlaneText {
-  media: string[]
+  media: string[];
 }

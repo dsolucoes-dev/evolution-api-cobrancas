@@ -19,15 +19,13 @@ export class sendMessageQueryParams {
   @IsString()
   token: string;
 
-
   @ApiPropertyOptional({ enum: ['sim', 'nao'] })
   @IsString()
   @IsOptional()
   gerar_pdf: string;
 }
 
-export class sendMessageQueryParamsIXC{
-
+export class sendMessageQueryParamsIXC {
   @ApiProperty()
   @IsString()
   app: string;
@@ -40,7 +38,6 @@ export class sendMessageQueryParamsIXC{
   @IsString()
   h: string;
 
-
   @ApiProperty()
   @IsString()
   op: string;
@@ -52,5 +49,4 @@ export class sendMessageQueryParamsIXC{
   @ApiProperty()
   @IsString()
   msg: string;
-  
 }

@@ -48,12 +48,12 @@ export class ApiController {
     try {
       const { u, h, to, msg } = query;
 
-      const data = {
+      const data: sendMessageQueryParams = {
         key: u,
         numero: to,
         mensagem: msg,
         token: h,
-        gerar_pdf: true,
+        gerar_pdf: 'sim',
       };
 
       const id =
@@ -90,11 +90,12 @@ export class ApiController {
     try {
       const { key, numero, mensagem, token } = body;
 
-      const data = {
+      const data: sendMessageQueryParams = {
         key,
         numero,
         mensagem,
         token,
+        gerar_pdf: 'nao',
       };
 
       const id =

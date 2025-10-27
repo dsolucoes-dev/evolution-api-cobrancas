@@ -30,8 +30,8 @@ export class EvalueChatService {
             headers: {
               apikey: `${data.token}`,
             },
-          },
-        ),
+          }
+        )
       );
     } catch (error) {
       console.log(JSON.stringify(error.response.data.response.message));
@@ -55,14 +55,14 @@ export class EvalueChatService {
             mimetype: 'application/pdf',
             caption: data.mensagem,
             media: data.media[0],
-            fileName: randomUUID(),
+            fileName: `${randomUUID()}.pdf`,
           },
           {
             headers: {
               apikey: `${data.token}`,
             },
-          },
-        ),
+          }
+        )
       );
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -74,7 +74,7 @@ export class EvalueChatService {
       // eslint-disable-next-line no-console
       console.log(
         'error.response?.data:',
-        JSON.stringify(error?.response?.data, null, 2),
+        JSON.stringify(error?.response?.data, null, 2)
       );
       // eslint-disable-next-line no-console
       console.log('error.response?.headers:', error?.response?.headers);
@@ -83,7 +83,7 @@ export class EvalueChatService {
       // eslint-disable-next-line no-console
       console.log(
         'error completo:',
-        JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+        JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
       );
       // eslint-disable-next-line no-console
       console.log('====================================================');
@@ -95,7 +95,7 @@ export class EvalueChatService {
       throw new Error(
         typeof errorMessage === 'string'
           ? errorMessage
-          : JSON.stringify(errorMessage),
+          : JSON.stringify(errorMessage)
       );
     }
   }
